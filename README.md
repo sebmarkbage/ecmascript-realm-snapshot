@@ -51,7 +51,7 @@ It's a non-goal to override the global proxy and provide alternative intrinsics 
 
 `RealmSnapshot` - Constructor for the opaque result returned by `compile`. Throws if invoked directly. It has an internal slot representing a compiled buffer which can be accessed by Host environment APIs in other specs.
 
-`RealmSnapshot.compile(realmBuilder, realmArguments)` - Accepts an instance of a `RealmBuilder` and an optional `Iterable` of `RealmValue` instances.
+`RealmSnapshot.compile(realmBuilder, realmArguments)` - Accepts an instance of a `RealmBuilder` and an optional `Iterable` of `RealmValue` instances. Returns a `Promise<RealmSnapshot>`. Each `RealmValue` has to be associated with this particular `RealmBuilder`'s environment, otherwise the promise is rejected. If compilation is successful, the Promise resolves into a `RealmSnapshot` object with its internal slot containing the compiled buffer representing the state of the `realmBuilder`'s internal `[[Realm]]`, its reachable references and those of each `RealmValue`.
 
 `RealmSnapshot.instantiate(realmSnapshot)` - Accepts a `RealmSnapshot` and returns a freshly instantiated `Realm` that is the equivalent of replaying the scripts that was issued on the `RealmBuilder`. The returned `Realm` has an extra property called `arguments` which contains the normal values that was passed as the second argument to `compile` (note that these are no longer opaque `RealmValue`).
 
