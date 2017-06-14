@@ -160,6 +160,14 @@ Realms are a complicated part of the ECMAScript spec. It's important that TC39 i
 
 JavaScript VMs are typically built as separate projects from Web Standards in a Browser (and reused across environments). This proposal is expected to be highly coupled to the VM implementation details and almost fully involve work from the VM teams. By putting the specification under TC39 it naturally follows the same test suites and specifications that these teams are already most concerned with.
 
+That said, this all ties into the whole strategy of script loading in a Browser environment and this will involve stake holders across all levels. We're simply start the discussion in the venue of TC39.
+
+## Why Constrain the API to Implementation Flexibility?
+
+This proposal is inherently implementation driven due to performance concerns. A goal of this proposal is to provide the semantic specifications that makes more types of optimizations possible, not to constrain them. However, it is also important to note that this should also provide __enough__ constraints to make optimizations possible at all.
+
+There are many possible architectural designs of a VM. We could litigate the legitimacy of any particular VM for ever. It is important to be able to allow a lot of flexibility and have different strategies compete. Therefore it is important that this proposal welcomes feedback from all implementors about how this might affect their implementation concerns.
+
 ### Why Not Just Preparse Scripts (like the Function constructor)?
 
 An alternative or complementary proposal could be to only do explicit preparsing/precompilation of script or function bodies. Similar to the Function constructor. That approach is also helpful but much more limited in the types of optimizations that a VM can choose to do. E.g. It doesn't allow information about hidden classes and expected object signatures to map to preserialized objects. Meanwhile, serialized Realms can contain individual functions as their exports so it also fully supports that use case. A VM can choose to only store preparsing of the script content.
