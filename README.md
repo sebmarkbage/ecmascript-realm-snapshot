@@ -102,9 +102,9 @@ request.onsuccess = async (event) => {
 
 ### Web: Declarative Import of a Realm
 
-Typical use case for loading a snapshot involves a complex loading strategy and caching mechanism. Browser engines [prefer to control that whole pipeline](https://github.com/WebAssembly/design/issues/972) at least  as a default.
+Typical use case for loading a snapshot involves a complex loading strategy and caching mechanism. Browser engines [prefer to control that whole pipeline](https://github.com/WebAssembly/design/issues/972) at least  as a default. After the lower level programmatic API there could also be a declarative API to load a pre-compiled Realm that lets the browser do its own caching.
 
-After the lower level programmatic API there could also be a declarative API to load a pre-compiled Realm that lets the browser do its own caching. E.g. there could be a new MIME type that runs a module (and its dependencies) in a new Realm and returns its exports.
+E.g. there could be a new MIME type that runs a module (and its dependencies) in a new Realm and returns its exports. The transport format is still the same an ECMAScript Module but the MIME type indicates that it should run in its own Realm. _TODO: This is a little sketchy. Needs more feedback._
 
 Example:
 
