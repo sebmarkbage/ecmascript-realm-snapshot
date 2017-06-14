@@ -41,7 +41,7 @@ It's a non-goal to override the global proxy and provide alternative intrinsics 
 
 ## Proposed API
 
-`RealmBuilder(hooks)` - Constructor to create an opaque Realm which can be compiled as a snapshot. Accepts an optional object with hooks similar to the [Realm API](https://github.com/tc39/proposal-realms). In the initial proposal only `importHook` is supported. Returns an exotic object that as a fresh new Realm stored in its `[[Realm]]` slot.
+`RealmBuilder(hooks)` - Constructor to create an opaque Realm which can be compiled as a snapshot. Accepts an optional object with hooks similar to the [Realm API](https://github.com/tc39/proposal-realms). In the initial proposal only `importHook` is supported. Returns an exotic object that as a fresh new Realm stored in its `[[Realm]]` slot. This realm's global object is a simple global object with no host APIs. Same as `new Realm().global`.
 
 `RealmBuilder.prototype.evalScript(scriptSource)` - Evaluates a script source in the global scope of the Realm stored in the RealmBuilder's `[[Realm]]` slot. Returns a new `RealmValue` which stores the completion value. If the script threw that's stored in the `RealmValue` as well.
 
