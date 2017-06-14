@@ -180,6 +180,10 @@ A VM might want to use a different representation for allocating objects for sna
 
 The heap is expected to contain closures and private state. Allowing arbitary objects to be serialized would open up the ability to probe the content of them. It wouldn't be completely open since the snapshot representation is opaque but clever hacks might be able to use it as a new attack surface.
 
+### How Does This Relate to AMP and HTML Import Caching?
+
+This is complementary. It's a smaller piece of a bigger platform that can safely precache larger pages. It starts smaller by making more pieces of the system incrementally deterministic. E.g. a Google AMP precompiler can start supporting pre-executing Realm Snapshot imports without necessarily making all scripts required to be deterministic.
+
 ### Prior ART in the JS Ecosystem
 
 [V8](https://v8project.blogspot.com/2015/09/custom-startup-snapshots.html)
