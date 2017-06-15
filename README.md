@@ -29,11 +29,11 @@ It is a goal to provide a plausible path forward to a declarative Web API for lo
 
 ### Non-Goals in the MVP
 
-It is a non-goal to provide a declarative loading API for the Web as part of this proposal but this proposal should take such a future hook into account. This is similar to [Web Assembly's path](https://github.com/WebAssembly/design/issues/972).
+It is a non-goal to provide a declarative loading API for the Web as part of this proposal but this proposal should take such a future hook into account. This is similar to [WebAssembly's path](https://github.com/WebAssembly/design/issues/972).
 
 It's a non-goal to support partial Realms (such as individual objects) to be serialized independently in this MVP but the API should support expanding to that in the future.
 
-It's a non-goal to support ECMAScript and Web Assembly to be compiled into a single snapshot for now.
+It's a non-goal to support ECMAScript and WebAssembly to be compiled into a single snapshot for now.
 
 It's a non-goal to support any form of abstraction interpretation and serialization of placeholder functions or values.
 
@@ -54,6 +54,8 @@ It's a non-goal to override the global proxy and provide alternative intrinsics 
 `RealmSnapshot.compile(realmBuilder, realmArguments)` - Accepts an instance of a `RealmBuilder` and an optional `Iterable` of `RealmValue` instances. Returns a `Promise<RealmSnapshot>`. Each `RealmValue` has to be associated with this particular `RealmBuilder`'s environment, otherwise the promise is rejected. If compilation is successful, the Promise resolves into a `RealmSnapshot` object with its internal slot containing the compiled buffer representing the state of the `realmBuilder`'s internal `[[Realm]]`, its reachable references and those of each `RealmValue`.
 
 `RealmSnapshot.instantiate(realmSnapshot)` - Accepts a `RealmSnapshot` and returns a freshly instantiated `Realm` that is the equivalent of replaying the scripts that was issued on the `RealmBuilder`. The returned `Realm` has an extra property called `arguments` which contains the normal values that was passed as the second argument to `compile` (note that these are no longer opaque `RealmValue`).
+
+`RealmSnapshot.instantiate(realmBuilder, realmArguments)` - Overloaded method. Shorthand for `RealmSnapshot.instantiate(await RealmSnapshot.compile(realmBuilder, realmArguments))`.
 
 ### Nested Realms
 
@@ -100,22 +102,17 @@ request.onsuccess = async (event) => {
 };
 ```
 
-### Web: Declarative Import of a Realm
+### Web: Automatic Caching of a Realm
 
-Typical use case for loading a snapshot involves a complex loading strategy and caching mechanism. Browser engines [prefer to control that whole pipeline](https://github.com/WebAssembly/design/issues/972) at least  as a default. After the lower level programmatic API there could also be a declarative API to load a pre-compiled Realm that lets the browser do its own caching.
+Typical use case for loading a snapshot involves a complex loading strategy and caching mechanism. Browser engines [prefer to control that whole pipeline](https://github.com/WebAssembly/design/issues/972) at least  as a default. There could also be a declarative API to load a pre-compiled Realm that lets the browser do its own caching.
 
-E.g. there could be a new MIME type that runs a module (and its dependencies) in a new Realm and returns its exports. The transport format is still the same an ECMAScript Module but the MIME type indicates that it should run in its own Realm. _TODO: This is a little sketchy. Needs more feedback._
+WebAssembly settled on [an extension API for Web Embedding](https://github.com/WebAssembly/design/blob/master/Web.md#additional-web-embedding-api) where `compile` and `instantiate` has additional forms that accept a `Response` object to be passed in directly.
 
-Example:
+Since the `RealmBuilder` can consist of several scripts we'll need something more granular than that. One possible solution is to extend `RealmBuilder` with streaming variants of `eval`.
 
-```js
-export let otherArray = [];
-```
+`RealmBuilder.prototype.evalStreamingScript(response)` - Accepts a `Response` object and returns a `RealmValue`. This `RealmValue` is a lazy value. When it is passed to `compile`, then `compile` must first resolve the `.text()` Promise of the response and pass that to `evalScript`. If that Promise is rejected, then the Promise returned by `compile` is rejected.
 
-```js
-import { otherArray } from "myRealmModule.realm";
-otherArray instanceof Array; // false
-```
+`RealmBuilder.prototype.evalStreamingModule(response)` - Same as `evalStreamingScript` but uses `evalModule` underneath.
 
 ### Node: Buffer from a RealmSnapshot
 
