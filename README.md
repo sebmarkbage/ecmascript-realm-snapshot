@@ -169,6 +169,12 @@ There are many possible architectural designs of a VM. We could litigate the leg
 
 An alternative or complementary proposal could be to only do explicit preparsing/precompilation of script or function bodies. Similar to the Function constructor. That approach is also helpful but much more limited in the types of optimizations that a VM can choose to do. E.g. It doesn't allow information about hidden classes and expected object signatures to map to preserialized objects. Meanwhile, serialized Realms can contain individual functions as their exports so it also fully supports that use case. A VM can choose to only store preparsing of the script content.
 
+### Why Not Just Use The Information From Previous Runs?
+
+One optimization browsers already use is caching code generated from a previous visit to a page. Since this code has already executed once it is possible to cache even optimization information, inline caches, hidden classes etc. This helps to some extent but it doesn't allow a heap to be safely serialized. It must reexecute every time.
+
+Additionally, this doesn't let this code get optimistically pre-executed. In an offline first loading model, provided by Service Workers, you typically run from the previous version of your code and upgrade to a newer version in the background. Frequently revisits will hit a fresh new version every time they visit the page. Downloading scripts can be done before first visit. Some preparsing can be done. However, optimizations that can be done __before__ first execution is limited. It is not safe to pre-execute arbitrary Realms. These Realm Snapshots provide a safe environment for code to be pre-executed.
+
 ### Why Not Serialize Any Existing Object Graph (like JSON)?
 
 Functions in this graph will have a Realm associated with them. It is also possible for other objects to have Realms associated with them in the internal representations. There might also be multiple Realms in this chain. Saving and restoring this information adds a lot of complexity to the API and the implementation.
