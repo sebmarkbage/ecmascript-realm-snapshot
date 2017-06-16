@@ -114,6 +114,17 @@ Since the `RealmBuilder` can consist of several scripts we'll need something mor
 
 `RealmBuilder.prototype.evalStreamingModule(response)` - Same as `evalStreamingScript` but uses `evalModule` underneath.
 
+Example:
+
+```js
+// Loading an auto-precompiled and cached Realm
+let response = await fetch(url);
+let realmBuilder = new RealmBuilder();
+let realmModule = realmBuilder.evalStreamingModule(response);
+let realm = await RealmSnapshot.instantiate(realmBuilder, [realmModule]);
+let [moduleInstance] = realm.arguments;
+```
+
 ### Node: Buffer from a RealmSnapshot
 
 Node environments are not concerned about leaking implementation details of host environments. The VM module already exposes [V8 cache data for parsing and code gen](https://nodejs.org/api/vm.html#vm_new_vm_script_code_options). Therefore, the raw binary representation can be exposed and stored in arbitrary places by the VM module.
